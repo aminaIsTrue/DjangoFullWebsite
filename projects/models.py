@@ -1,10 +1,15 @@
 from os import truncate
 from django.db import models
 import uuid
+from users.models import Profile
+
 # Create your models here
 
 
 class  Project(models.Model):
+    #when   an owner is deleted, we do not want that the projects are deleted because he/she may be done that by accident
+    #so when  they come back they still find there projects!
+    owner = models.ForeignKey(Profile,null=True, blank=True,on_delete=models.SET_NULL)
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     featured_image =models.ImageField(null=True,blank=True,default="default.jpg")
@@ -26,7 +31,7 @@ class Review(models.Model):
         ('down','Down Vote')
 
     )
-    #owner
+    #owner = 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     body = models.TextField(blank=True, null=True)
     value = models.CharField(max_length=200,choices=Vote_Type)
