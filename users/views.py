@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from .forms import CustomUserCreationForm
 # Create your views here.
 
 def profiles(request):
@@ -18,6 +19,8 @@ def UserProfile(request,pk):
 
 
 def loginUser(request):
+    page = 'login'
+    context ={'page':page}
     #here, we do not want the athenticated user to see the login page because she/he already authenticated
     #no need to land in that page again!
     if request.user.is_authenticated:
@@ -45,7 +48,7 @@ def loginUser(request):
             #better not to give the hint that such a username exists!
             messages.error(request, 'Username Or The password is not correct, try again!')
 
-    return render(request,'users/login-register.html')
+    return render(request,'users/login-register.html',context)
 
 
 def logoutUser(request):
@@ -55,3 +58,26 @@ def logoutUser(request):
     logout(request)
     messages.error(request, 'User loged out!') 
     return redirect('login-path')
+
+def registerUser(request):
+    page = 'register'
+    form = CustomUserCreationForm()
+    context ={'page':page, 'form':form}
+
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            #we want the username to be saved lowercased in the database
+            #thats why we:
+            #  1- hold the user, (another reason to hold the user is to log him/her in automatically using login(request,user))
+            # 2-set the commit to false until making sure the username is lowercased, 
+            # 3- then save the user in the database  
+            user = form.save(commit = False)
+            user.username = user.username.lower()
+            user.save()
+            messages.success(request, 'User account is created!')
+            login(request,user)
+            return redirect('profiles-path')
+        else:
+            messages.error(request, 'An error has occured during registration!')
+    return render(request,'users/login-register.html',context)

@@ -2,13 +2,24 @@
 
 
 {% block content %}
-<form method="POST" action="{% url 'login-path' %}">
-  {% csrf_token %}  
 
-  <input type="text" name="username" placeholder="username">
-  <input type="password" name="password" placeholder=" Enter password">
-  <input type="submit" value="Login">
+{% if page == 'login' %}
+  <form method="POST" action="{% url 'login-path' %}">
+    {% csrf_token %}  
 
-</form>
+    <input type="text" name="username" placeholder="username">
+    <input type="password" name="password" placeholder=" Enter password">
+    <input type="submit" value="Login">
+    <p>Don't have an account? <a href="{% url 'register-path' %}">Sign Up</a></p>
+  </form>
+{% else %}
+  <h1>Register</h1>
+  <form method="POST" action="{% url 'register-path' %}">
+    {% csrf_token %}  
+    {{form.as_p}}
+    <input type="submit" value="Register">
+    <p>Have have an account? <a href="{% url 'login-path' %}">Login</a></p>
+  </form>
+  {% endif %}
   
 {% endblock content %}
