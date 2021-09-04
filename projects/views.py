@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, request
+from django.contrib.auth.decorators import login_required
 from .models import Project
 from .forms import ProjectForm
 # Create your views here.
@@ -15,7 +16,8 @@ def project(request,pk):
     tags = projetObj.tags.all()
     context = {"projetObj":projetObj, 'tags':tags}
     return render(request, 'projects/single-project.html',context)
-
+    
+@login_required(login_url = 'login-path')
 def createProject(request):
     form = ProjectForm()
     if request.method == 'POST':
