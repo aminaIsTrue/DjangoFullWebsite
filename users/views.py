@@ -56,7 +56,7 @@ def logoutUser(request):
     # for the logout we just pass-in  request 
     # by that we delete the **session** of that user which means an authentication is needed
     logout(request)
-    messages.error(request, 'User loged out!') 
+    messages.info(request, 'User loged out!') 
     return redirect('login-path')
 
 def registerUser(request):
