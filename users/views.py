@@ -81,3 +81,11 @@ def registerUser(request):
         else:
             messages.error(request, 'An error has occured during registration!')
     return render(request,'users/login-register.html',context)
+@login_required(login_url='login-path')
+def userAccount(request):
+    #we can get the user from the request (it is one of the info in the dictionary)
+    #each user created we has the profile automatically created
+    profileUser = request.user.profile
+    projects = profileUser.project_set.all()
+    context = {'profileUser': profileUser,'projects': projects}
+    return render(request,'users/account.html',context)
