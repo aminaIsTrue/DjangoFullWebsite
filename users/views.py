@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, ProfileForm
 # Create your views here.
 
 def profiles(request):
@@ -77,7 +77,7 @@ def registerUser(request):
             user.save()
             messages.success(request, 'User account is created!')
             login(request,user)
-            return redirect('profiles-path')
+            return redirect('edit-account-path')
         else:
             messages.error(request, 'An error has occured during registration!')
     return render(request,'users/login-register.html',context)
@@ -89,3 +89,20 @@ def userAccount(request):
     projects = profileUser.project_set.all()
     context = {'profileUser': profileUser,'projects': projects}
     return render(request,'users/account.html',context)
+
+@login_required(login_url='edit-account-path')
+def editAccount(request):
+    user = request.user
+    profile = user.profile
+    form = ProfileForm(instance = profile)
+    context = {'form': form}
+    if request.method == 'POST':
+        if form.is_valid:
+            # because it is an update we need to mention the instance
+            #and since we are sending images as well we neet to mention request.FILES
+         profile = ProfileForm(request.POST,request.FILES,instance = profile )
+         profile.save()
+         print ('*************************************************')
+         return redirect('account-path')
+        
+    return render(request,'users/profile-form.html',context)
