@@ -1,10 +1,11 @@
+from collections import namedtuple
 from django.shortcuts import render,redirect
 from.models import Profile, Skill
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import CustomUserCreationForm, ProfileForm
+from .forms import CustomUserCreationForm, ProfileForm, SkillForm
 # Create your views here.
 
 def profiles(request):
@@ -102,7 +103,52 @@ def editAccount(request):
             #and since we are sending images as well we neet to mention request.FILES
          profile = ProfileForm(request.POST,request.FILES,instance = profile )
          profile.save()
-         print ('*************************************************')
          return redirect('account-path')
         
     return render(request,'users/profile-form.html',context)
+
+
+login_required(login_url='login-path')
+def createSkill(request):
+    form = SkillForm()
+    context = {'form':form}
+    if request.method == 'POST':
+        form = SkillForm(request.POST)
+        if form.is_valid:
+            profile = request.user.profile
+            skill = form.save(commit = False)
+            skill.owner = profile
+            skill.save()
+            messages.success(request, 'Skill added successfully!')
+            return redirect('account-path')
+
+    return render(request,'users/skill_form.html',context)
+
+login_required(login_url='login-path')
+def updateSkill(request, pk):
+    profile = request.user.profile
+    skill = profile.skill_set.get(id = pk)
+    # to have the form populated with the info we want to update
+    form = SkillForm(instance=skill)
+    context = {'form':form}
+    if request.method == 'POST':
+        #we give the request.POST data and the instance we want to update ==>change the instance with the request.POST info!
+        form = SkillForm(request.POST,instance=skill)
+        if form.is_valid:
+            form.save()
+            messages.success(request, 'Skill updated successfully!')
+            return redirect('account-path')
+
+    return render(request,'users/skill_form.html',context)
+
+
+@login_required(login_url='login-path')
+def deleteSkill(request,pk):
+    skill = request.user.profile.skill_set.get(id= pk)
+    if request.method == 'POST':
+            skill.delete()
+            messages.success(request, 'Skill deleted successfully!')
+            return redirect ("account-path")
+
+    context = {'object':skill}
+    return render(request,'delete_template.html',context)
