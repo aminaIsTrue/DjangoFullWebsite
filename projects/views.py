@@ -1,3 +1,4 @@
+from django.core import paginator
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, request
 from django.contrib.auth.decorators import login_required
@@ -5,13 +6,14 @@ from .models import Project, Tag
 from .forms import ProjectForm
 from django.contrib import messages
 from django.db.models import Q
-from .utils import searchProjects
+from .utils import searchProjects,paginateProject
+
 # Create your views here.
-
-
 def projects(request):
     projects, search_query = searchProjects (request)
-    context = {'projects': projects , 'search_query': search_query}
+    customRange, projects = paginateProject(request,projects,6)
+
+    context = {'projects': projects , 'search_query': search_query, 'customRange':customRange}
     return render(request,'projects/projects.html',context)
 
 def project(request,pk):

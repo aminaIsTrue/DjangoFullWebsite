@@ -23,6 +23,9 @@ class  Project(models.Model):
 
     def __str__(self):
         return self.title
+    class Meta:
+        # the dash before created reverse the ordering
+        ordering = ['created']
 
 
 class Review(models.Model):

@@ -1,0 +1,33 @@
+<!--We want the pagination section to show only if there are more than a page-->
+    <!--we can do (if  paginator.num_pages > 1) as a condition too-->
+    <!--we want to use this pagination for projects and profiles
+    that is why we need to change the object we call to more general one
+    like "queryset or objects" -->
+    {% if  queryset.has_other_pages %}
+          <!-- pagination Section -->
+          <div class="pagination">
+            <ul class="container">
+              
+              {% if queryset.has_previous  %}
+                <li><a href="?page={{queryset.previous_page_number}}" class="btn">&#10094; Prev</a></li>
+              {% endif %}
+                
+              
+              {% for page in customRange  %}
+                <!-- the if statement allows to highlight the button of the page we are acctually in !!-->
+                <!-- need to understand more this projects number!!-->
+                {% if page == queryset.number  %}
+                  <li><a href="?page={{page}}" class="btn btn--sub">{{ page }}</a></li>
+                {% else %}
+                  <li><a href="?page={{page}}" class="btn">{{ page }}</a></li>
+                {% endif %}
+              {% endfor %}
+              
+              {% if queryset.has_next %}
+              <li><a href="?page={{queryset.next_page_number}}" class="btn">Next &#10095;</a></li>
+              {% endif %}
+                
+              
+            </ul>
+          </div>
+    {% endif %}
