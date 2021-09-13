@@ -11,7 +11,7 @@ from .utils import searchProjects,paginateProject
 # Create your views here.
 def projects(request):
     projects, search_query = searchProjects (request)
-    customRange, projects = paginateProject(request,projects,6)
+    customRange, projects = paginateProject(request,projects,3)
 
     context = {'projects': projects , 'search_query': search_query, 'customRange':customRange}
     return render(request,'projects/projects.html',context)

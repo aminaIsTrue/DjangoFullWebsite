@@ -55,6 +55,6 @@
           </div>
         </div>
       </section>
-      {% include "pagination.html"  with queryset=profiles  customRange=customRange %}
+      {% include "pagination.html"  with queryset=profiles  customRange=customRange search_query=search_query %}
     </main>
 {% endblock content %}

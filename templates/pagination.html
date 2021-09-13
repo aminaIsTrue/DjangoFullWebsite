@@ -9,7 +9,7 @@
             <ul class="container">
               
               {% if queryset.has_previous  %}
-                <li><a href="?page={{queryset.previous_page_number}}" class="btn">&#10094; Prev</a></li>
+                <li><a href="?page={{queryset.previous_page_number}}&search_query={{search_query}}" class="btn">&#10094; Prev</a></li>
               {% endif %}
                 
               
@@ -17,14 +17,14 @@
                 <!-- the if statement allows to highlight the button of the page we are acctually in !!-->
                 <!-- need to understand more this projects number!!-->
                 {% if page == queryset.number  %}
-                  <li><a href="?page={{page}}" class="btn btn--sub">{{ page }}</a></li>
+                  <li><a href="?page={{page}}&search_query={{search_query}}" class="btn btn--sub">{{ page }}</a></li>
                 {% else %}
-                  <li><a href="?page={{page}}" class="btn">{{ page }}</a></li>
+                  <li><a href="?page={{page}}&search_query={{search_query}}" class="btn">{{ page }}</a></li>
                 {% endif %}
               {% endfor %}
               
               {% if queryset.has_next %}
-              <li><a href="?page={{queryset.next_page_number}}" class="btn">Next &#10095;</a></li>
+              <li><a href="?page={{queryset.next_page_number}}&search_query={{search_query}}" class="btn">Next &#10095;</a></li>
               {% endif %}
                 
               
