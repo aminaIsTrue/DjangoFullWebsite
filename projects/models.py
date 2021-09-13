@@ -25,8 +25,24 @@ class  Project(models.Model):
         return self.title
     class Meta:
         # the dash before created reverse the ordering
-        ordering = ['created']
+        ordering = ['-vote_ratio', '-vote_total','title']
 
+    @property
+    def getProjectReviewersIds(self):
+        
+        #get all the reviewers' Ids of a project, and convert it into a true list!
+        queryset = self.review_set.all().values_list('owner__id', flat=True)
+        return queryset
+
+    @property   #so we can use it as an attribute and not as a property without "()"
+    def  getVoteCount(self):
+        reviews = self.review_set.all()
+        upVote = reviews.filter(value = 'up').count()
+        totalVotes = reviews.count()
+        ratio = int((upVote/totalVotes) * 100) 
+        self.vote_total = totalVotes
+        self.vote_ratio = ratio
+        self.save()
 
 class Review(models.Model):
     Vote_Type = (
@@ -34,11 +50,14 @@ class Review(models.Model):
         ('down','Down Vote')
 
     )
-    #owner = 
+    owner = models.ForeignKey(Profile,null=True, on_delete=models.CASCADE,blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     body = models.TextField(blank=True, null=True)
     value = models.CharField(max_length=200,choices=Vote_Type)
     id = models.UUIDField(default=uuid.uuid4,unique=True, primary_key=True,editable=False)
+    class Meta:
+        unique_together = [['owner', 'project']]
+
     def __str__(self):
         return self.value
 

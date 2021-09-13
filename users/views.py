@@ -30,7 +30,7 @@ def loginUser(request):
     if request.user.is_authenticated:
         return redirect('profiles-path')
     if request.method ==  'POST':
-        username = request.POST['username']
+        username = request.POST['username'].lower()
         password = request.POST['password']  
 
         try:
@@ -45,7 +45,7 @@ def loginUser(request):
             # 1- creat a seesion for this user in the database
             #2- add the session information to the browser's cookies
             login(request,user)
-            return redirect('profiles-path')
+            return redirect(request.GET['next'] if 'next' in request.GET else 'account-path')
         else:
             #even if we checked the username but we still ne to  say the either username or password are incorrect
             #because it may that the person has entered a correct username that it is not her/his

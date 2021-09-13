@@ -2,8 +2,8 @@ from django.core import paginator
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, request
 from django.contrib.auth.decorators import login_required
-from .models import Project, Tag
-from .forms import ProjectForm
+from .models import Project, Review, Tag
+from .forms import ProjectForm,ReviewForm
 from django.contrib import messages
 from django.db.models import Q
 from .utils import searchProjects,paginateProject
@@ -11,7 +11,7 @@ from .utils import searchProjects,paginateProject
 # Create your views here.
 def projects(request):
     projects, search_query = searchProjects (request)
-    customRange, projects = paginateProject(request,projects,3)
+    customRange, projects = paginateProject(request,projects,6)
 
     context = {'projects': projects , 'search_query': search_query, 'customRange':customRange}
     return render(request,'projects/projects.html',context)
@@ -19,7 +19,19 @@ def projects(request):
 def project(request,pk):
     projetObj = Project.objects.get(id = pk)
     tags = projetObj.tags.all()
-    context = {"projetObj":projetObj, 'tags':tags}
+    reviews = Review.objects.filter(project = projetObj)
+    reviewForm = ReviewForm()
+    context = {"projetObj":projetObj, 'tags':tags, 'reviews':reviews, 'reviewForm':reviewForm}
+    if request.method == 'POST':
+        reviewForm = ReviewForm(request.POST)
+        if reviewForm.is_valid:
+            review = reviewForm.save(commit = False)
+            review.project = projetObj
+            review.owner = request.user.profile
+            review.save()
+            projetObj.getVoteCount
+            messages.success(request,'Review successfully submitted!')
+
     return render(request,'projects/single-project.html',context)
     
 @login_required(login_url = 'login-path')
