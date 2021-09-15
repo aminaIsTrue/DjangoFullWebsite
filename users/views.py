@@ -1,11 +1,11 @@
 from collections import namedtuple
 from django.shortcuts import render,redirect
-from.models import Profile, Skill
+from.models import Profile, Skill, Message
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import CustomUserCreationForm, ProfileForm, SkillForm
+from .forms import CustomUserCreationForm, ProfileForm, SkillForm,MessageForm
 from django.db.models import Q
 from .utils import searchProfiles,paginateProfile
 # Create your views here.
@@ -155,3 +155,59 @@ def deleteSkill(request,pk):
 
     context = {'object':skill}
     return render(request,'delete_template.html',context)
+
+@login_required(login_url='login-path')
+def inbox(request):
+    profile = request.user.profile
+    recipient = profile
+    # we need not to call it messages, it can conflict with Djanfo Flash messages!
+    #we called the recipient by the related_name = messages ! stiil need to ponder about it!
+    inboxMessages = recipient.messages.all()
+    # we want to count the number of unread message so we can distinguish them from the 
+    #read meassage in the inbox template
+    unreadMessagesCount = inboxMessages.filter(is_read = False).count()
+    context = {'inboxMessages':inboxMessages, 'unreadMessagesCount':unreadMessagesCount}
+    return render(request,'users/inbox.html',context)
+
+@login_required(login_url='login-path')
+def viewMessage(request,pk):
+    #we need to make sure that not any one who knows the message can get it
+    profile = request.user.profile
+    #so we get the message id from that profile
+    #if the id message does not exist  in the profile
+    #it means that the one asking to see that message is not the one who have got the message!
+    msg = profile.messages.get(id = pk)
+    #we want to trigger the save method just when we click on unread message
+    if msg.is_read == False:
+        msg.is_read= True
+        msg.save()
+    context = {'msg':msg}
+    return render(request,'users/message.html',context)
+
+def createMessge(request,pk):
+    
+    recepient = Profile.objects.get(id = pk)
+    form = MessageForm()
+    try:
+                sender = request.user.profile
+    except:
+        sender = None
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            msg = form.save(commit = False)
+            msg.sender = sender
+            msg.recepient = recepient
+            if sender == None :
+                msg.name = request.POST.get('name') 
+                msg.email = request.POST.get('email')
+            else:
+                msg.name = sender.name
+                msg.email = sender.email
+            msg.save()
+            messages.success(request, 'Message sent successfully!') 
+            return redirect ('userProfile-path',pk = recepient.id )
+
+    context = {'form':form, 'recepient': recepient}
+    return render (request,'users/message-form.html',context)

@@ -12,4 +12,7 @@ urlpatterns = [
     path('create-skill/',views.createSkill,name='create-skill-path'),
     path('update-skill/<str:pk>/',views.updateSkill,name='update-skill-path'),
     path('delete-skill/<str:pk>/',views.deleteSkill,name='delete-skill-path'),
+    path('inbox/',views.inbox,name='inbox-path'),
+    path('message/<str:pk>/',views.viewMessage,name='viewMessage-path'),
+    path('create-message/<str:pk>/',views.createMessge,name='create-message-path'),
 ]
