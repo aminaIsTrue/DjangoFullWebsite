@@ -118,7 +118,16 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT  = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'appdev.testdev@gmail.com'
+# here I need to put the password for my Email
+# to make the emails safer, put them on "Environment variables"
+# or have a temporary password from Gmail just for this web app
+#
+EMAIL_HOST_PASSWORD = 'hscodsisbwbcqush'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 

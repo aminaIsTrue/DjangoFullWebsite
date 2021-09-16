@@ -71,6 +71,7 @@ def registerUser(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
+            #print('*****************', request.POST,'*********************')
             #we want the username to be saved lowercased in the database
             #thats why we:
             #  1- hold the user, (another reason to hold the user is to log him/her in automatically using login(request,user))
@@ -83,7 +84,7 @@ def registerUser(request):
             login(request,user)
             return redirect('edit-account-path')
         else:
-            messages.error(request, 'An error has occured during registration!')
+            messages.error(request, messages.error)
     return render(request,'users/login-register.html',context)
 @login_required(login_url='login-path')
 def userAccount(request):
